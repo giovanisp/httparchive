@@ -18,8 +18,62 @@ limitations under the License.
 require_once("utils.inc");
 require_once("dbapi.inc");
 
+$gaCdfStats = array(
+					"TTFB",
+					"renderStart",
+					"onContentLoaded", 
+					"onLoad",
+					"fullyLoaded",
+					"visualComplete",
+					"PageSpeed",
+					"SpeedIndex",
+					"reqTotal",
+					"reqHtml",
+					"reqJS",
+					"reqCSS",
+					"reqImg",
+					"reqGif",
+					"reqJpg",
+					"reqPng",
+					"reqFlash",
+					"reqFont",
+					"reqJson",
+					"reqOther",
+					"bytesTotal",
+					"bytesHtml",
+					"bytesJS",
+					"bytesCSS",
+					"bytesImg",
+					"bytesGif",
+					"bytesJpg",
+					"bytesPng",
+					"bytesFlash",
+					"bytesFont",
+					"bytesJson",
+					"bytesOther",
+					"bytesHtmlDoc",
+					"numDomains",
+					"maxDomainReqs",
+					"numRedirects",
+					"numErrors", 
+					"numGlibs",
+					"numHttps",
+					"numCompressed",
+					"numDomElements",
+					"gzipTotal",
+					"gzipSavings",
+					"_connections",
+					"avg_dom_depth",
+					"document_height",
+					"document_width",
+					"localstorage_size",
+					"sessionstorage_size",
+					"num_iframes",
+					"num_scripts",
+					);
 
-function addStats($label, $slice, $device, $hStats=null) {
+
+function addStats($label, $slice, $device, $hStats=null, $crawlid=null) {
 	if ( getStatsData($label, $slice, $device) ) {
 		return true;
 	}
@@ -28,11 +82,11 @@ function addStats($label, $slice, $device, $hStats=null) {
 		$hStats = computeStats($label, $slice, $device);
 	}
 
-	return addStatsData($label, $slice, $device, $hStats);
+	return addStatsData($label, $slice, $device, $hStats, $crawlid);
 }
 
 
-function replaceStats($label, $slice=null, $device=null, $hStats=null) {
+function replaceStats($label, $slice=null, $device=null, $hStats=null, $crawlid=null) {
 	$device = ( $device ? $device : curDevice() );
 
 	if ( $slice ) {
@@ -40,7 +94,7 @@ function replaceStats($label, $slice=null, $device=null, $hStats=null) {
 			$hStats = computeStats($label, $slice, $device);
 		}
 		removeStats($label, $slice, $device);
-		addStatsData($label, $slice, $device, $hStats);
+		addStatsData($label, $slice, $device, $hStats, $crawlid);
 	}
 	else {
 		// If $slice is NOT provided, do ALL slices (eg, "All", "Top1000", "Top100").
@@ -48,7 +102,7 @@ function replaceStats($label, $slice=null, $device=null, $hStats=null) {
 		foreach ( $aSlices as $slice ) {
 			$hStats = computeStats($label, $slice, $device);
 			removeStats($label, $slice, $device);
-			addStatsData($label, $slice, $device, $hStats);
+			addStatsData($label, $slice, $device, $hStats, $crawlid);
 		}
 	}
 }
@@ -131,18 +185,18 @@ $gaTrendsCompute = array(
 					  "ROUND(AVG(numDomains)) as numDomains",
 					  "ROUND(AVG(maxDomainReqs)) as maxDomainReqs",
 
-					  "TRUNCATE(AVG(reqTotal), 1) as reqTotal",
-					  "TRUNCATE(AVG(reqHtml), 1) as reqHtml",
-					  "TRUNCATE(AVG(reqJS), 1) as reqJS",
-					  "TRUNCATE(AVG(reqCSS), 1) as reqCSS",
-					  "TRUNCATE(AVG(reqImg), 1) as reqImg",
-					  "TRUNCATE(AVG(reqFlash), 1) as reqFlash",
-					  //"TRUNCATE(AVG(reqJson), 1) as reqJson", // too hard to identify based on mimeType
-					  "TRUNCATE(AVG(reqOther), 1) as reqOther",
-					  "TRUNCATE(AVG(reqFont), 1) as reqFont",
-					  "TRUNCATE(AVG(reqGif), 1) as reqGif",
-					  "TRUNCATE(AVG(reqJpg), 1) as reqJpg",
-					  "TRUNCATE(AVG(reqPng), 1) as reqPng",
+					  "ROUND(AVG(reqTotal), 1) as reqTotal",
+					  "ROUND(AVG(reqHtml), 1) as reqHtml",
+					  "ROUND(AVG(reqJS), 1) as reqJS",
+					  "ROUND(AVG(reqCSS), 1) as reqCSS",
+					  "ROUND(AVG(reqImg), 1) as reqImg",
+					  "ROUND(AVG(reqFlash), 1) as reqFlash",
+					  //"ROUND(AVG(reqJson), 1) as reqJson", // too hard to identify based on mimeType
+					  "ROUND(AVG(reqOther), 1) as reqOther",
+					  "ROUND(AVG(reqFont), 1) as reqFont",
+					  "ROUND(AVG(reqGif), 1) as reqGif",
+					  "ROUND(AVG(reqJpg), 1) as reqJpg",
+					  "ROUND(AVG(reqPng), 1) as reqPng",
 					  "ROUND(AVG(bytesTotal)) as bytesTotal",
 					  "ROUND(AVG(bytesHtml)) as bytesHtml",
 					  "ROUND(AVG(bytesJS)) as bytesJS",
@@ -191,13 +245,13 @@ $gaTrendsGet = array(
 					 "num_scripts",
 
 					 "ROUND(reqTotal) as reqTotal",       // if there are A LOT of requests, do ROUND
-					 "TRUNCATE(reqHtml, 1) as reqHtml",   // if there are A FEW requests, show a float
+					 "ROUND(reqHtml, 1) as reqHtml",   // if there are A FEW requests, show a float
 					 "ROUND(reqJS) as reqJS",
-					 "TRUNCATE(reqCSS, 1) as reqCSS",
+					 "ROUND(reqCSS, 1) as reqCSS",
 					 "ROUND(reqImg) as reqImg",
-					 "TRUNCATE(reqFlash, 1) as reqFlash",
-					 "TRUNCATE(reqFont, 1) as reqFont",
-					 "TRUNCATE(reqOther, 1) as reqOther",
+					 "ROUND(reqFlash, 1) as reqFlash",
+					 "ROUND(reqFont, 1) as reqFont",
+					 "ROUND(reqOther, 1) as reqOther",
 					 "ROUND(bytesTotal/1024) as bytesTotal",
 					 "ROUND(bytesHtml/1024) as bytesHtml",
 					 "ROUND(bytesJS/1024) as bytesJS",
@@ -224,10 +278,13 @@ $gaTrendsGetLabel = array(
 
 
 // return a hash of values for a single stats record
-function addStatsData($label, $slice, $device, $hTuples) {
+function addStatsData($label, $slice, $device, $hTuples, $crawlid=null) {
 	$hTuples["label"] = $label;
 	$hTuples["slice"] = $slice;
 	$hTuples["device"] = $device;
+	if ( $crawlid ) {
+		$hTuples["crawlid"] = $crawlid;
+	}
 	$statstable = statsTable($label, $slice, $device);
 	$cmd = "replace into $statstable set " . hashImplode(", ", "=", $hTuples) . ";";
 
@@ -404,6 +461,7 @@ function updateStats($label, $slice, $device) {
 		//$hStats += computeCorrelations($label, $slice, $device, $sliceCond, "onLoad");
 		//$hStats += computeCorrelations($label, $slice, $device, $sliceCond, "renderStart");
 		computeOther($label, $slice, $device, $sliceCond, $hStats);
+		computeCdfForCrawl($label);
         $hStats = array_merge($hStats, $newStats); // $newStats will overwrite $hStats for duplicate keys
 	}
 
@@ -420,6 +478,7 @@ function computeStats($label, $slice, $device) {
 	$hStats += computeCorrelations($label, $slice, $device, $sliceCond, "onLoad");
 	$hStats += computeCorrelations($label, $slice, $device, $sliceCond, "renderStart");
 	$hStats += computeOther($label, $slice, $device, $sliceCond);
+	computeCdfForCrawl($label);
 
 	return $hStats;
 }
@@ -670,6 +729,57 @@ function updatePageMaxage($pageid) {
 		", maxageMore = $maxageMore" .
 		" where pageid = $pageid;";
 	doSimpleCommand($cmd);
+}
+
+
+function computeCdfForCrawl($label) {
+	$crawl = getCrawl($label);
+	$aSlices = array("All", "Top1000", "Top100");
+	foreach( $aSlices as $slice ) {
+		computeCdf($crawl, $slice);
+	}
+}
+
+
+// Update the "cdf" table for the desired CDF stats.
+function computeCdf($crawl, $slice) {
+	global $gaCdfStats, $gCdfTable, $gPagesTable;
+
+	$crawlid = $crawl['crawlid'];
+	$label = $crawl['label'];
+	$device = $crawl['location'];
+	$sliceCond = sliceCond($label, $slice, $device);
+	$query = "select count(*) as num from $gPagesTable where $sliceCond;";
+	$numUrls = doSimpleQuery($query);
+	if ( 0 == $numUrls ) {
+		echo "ERROR: no URLs for query: $query\n";
+		return;
+	}
+
+	foreach ( $gaCdfStats as $stat ) {
+		$query = "select $stat from $gPagesTable where $sliceCond order by $stat asc;";
+		$result = doQuery($query);
+		$nRows = mysql_num_rows($result);
+		if ( $nRows != $numUrls ) {
+			echo "WARNING: Row count differs for \"$stat\" for slice \"$slice\": should be $numUrls but only $nRows rows found.\n  $query\n\n";
+		}
+
+		$aTuples = array();
+		for ( $i = 1; $i <= 100; $i++ ) {
+			// skip to the Nth row in the results that corresponds to this percentile
+			// TODO - if N is between rows we should really take an average of the two adjacent values
+			$limit = ceil($i * $nRows / 100) - 1;
+			mysql_data_seek($result, $limit);
+			if ( $row = mysql_fetch_array($result) ) {
+				$val = ( $row[0] ? $row[0] : "0" );
+				array_push($aTuples, "percentile$i = $val");
+			}
+		}
+		mysql_free_result($result);
+
+		$cmd = "REPLACE INTO $gCdfTable SET crawlid=$crawlid, slice='$slice', stat='$stat', " . implode(", ", $aTuples) . ";";
+		doSimpleCommand($cmd);
+	}
 }
 
 ?>

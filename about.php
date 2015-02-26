@@ -98,7 +98,8 @@ and
 
 <h2 id=datagathered>How is the data gathered?</h2>
 
-<p>The list of URLs is fed to our private instance of <a href="http://webpagetest.org">WebPagetest</a>. 
+<p>The list of URLs is fed to our private instance of <a href="http://webpagetest.org">WebPagetest</a> 
+on the 1st and 15th of each month. 
 (Huge thanks to Pat Meenan!)</p>
 
 <p>The WebPagetest settings are:</p>
@@ -133,6 +134,20 @@ is another variable that affects time measurements.
 
 <p>Given these conditions it's virtually impossible to compare WebPagetest.org's time measurements with those gathered 
 in other browsers or locations or connection speeds. They are best used as a source of comparison.</p>
+
+
+<h2 id=bigquery>How do I use BigQuery to write custom queries over the data?</h2>
+
+<p>
+The HTTP Archive <a href="downloads.php">data dumps</a>
+are also available in <a href="https://bigquery.cloud.google.com/">Google BigQuery</a> thanks to <a href="https://twitter.com/igrigorik">Ilya Grigorik</a>. 
+This means you can create your own custom queries like 
+<a href="http://bigqueri.es/t/how-many-resources-return-last-modified-and-or-etag-values/407">How many resources return Last-Modified and/or ETag values?</a> and 
+<a href="http://bigqueri.es/t/what-is-the-distribution-of-1st-party-vs-3rd-party-resources/100/5">What is the distribution of 1st party vs 3rd party resources?</a>.
+For more information see Ilya's blog post <a href="https://www.igvita.com/2013/06/20/http-archive-bigquery-web-performance-answers/">HTTP Archive + BigQuery = Web Performance Answers</a> 
+and <a href="https://www.youtube.com/watch?v=TOFgDSqNRz4">video</a>.
+And checkout all the custom queries shared on <a href="http://bigqueri.es/c/http-archive">BigQueri.es</a>.
+<p>
 
 
 <h2 id=xfersize2012>Why are transfer sizes prior to Oct 1 2012 smaller?</h2>
@@ -539,8 +554,9 @@ The HTTP Archive is possible through the support of these sponsors:
 <a title="dynaTrace Software" href="http://www.dynatrace.com/">dynaTrace Software</a>,
 <a title="Torbit" href="http://torbit.com/">Torbit</a>,
 <a title="Instart Logic" href="http://instartlogic.com/">Instart Logic</a>,
+<a title="Catchpoint Systems" href="http://www.catchpoint.com/">Catchpoint Systems</a>,
 and
-<a title="Catchpoint Systems" href="http://www.catchpoint.com/">Catchpoint Systems</a>.
+<a title="Fastly" href="http://bit.ly/1nWd1oL">Fastly</a>.
 </p>
 
 <style>
@@ -559,6 +575,7 @@ and
 <a class=image-link style="" title="Torbit" href="http://torbit.com/"><img class="alignnone" title="Torbit" src="/images/torbit_120.png" alt="" width="120" height="25" /></a>
 <a class=image-link style="" title="Instart Logic" href="http://instartlogic.com/"><img class="alignnone" title="Instart Logic" src="/images/Instart_Logic_Logo_150px-width.jpg" alt="" width=150 height=44 /></a>
 <a class=image-link style="" title="Catchpoint Systems" href="http://www.catchpoint.com/"><img class="alignnone" title="Catchpoint Systems" src="/images/cp-logo-150px.png" alt="" width="150" height="150" /></a>
+<a class=image-link style="" title="Fastly" href="http://bit.ly/1nWd1oL"><img class="alignnone" title="Fastly" src="/images/fastly_logo_115x115.png" alt="" width="115" height="115" /></a>
 <!--
 -->
 </div>
